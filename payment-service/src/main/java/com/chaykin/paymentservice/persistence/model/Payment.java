@@ -1,5 +1,6 @@
 package com.chaykin.paymentservice.persistence.model;
 
+import com.chaykin.common.model.payment.PaymentMethod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -48,7 +49,7 @@ public class Payment {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private PaymentStatus status;
+    private com.chaykin.common.model.payment.PaymentStatus status;
 
     @Column(name = "transaction_id")
     private String transactionId;

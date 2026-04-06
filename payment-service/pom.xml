@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.chaykin</groupId>
-            <artifactId>common-exception</artifactId>
+            <artifactId>common-models</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

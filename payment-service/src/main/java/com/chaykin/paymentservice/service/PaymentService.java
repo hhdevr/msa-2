@@ -1,6 +1,6 @@
 package com.chaykin.paymentservice.service;
 
-import com.chaykin.paymentservice.service.model.PaymentDto;
+import com.chaykin.common.model.payment.PaymentDto;
 
 import java.util.List;
 import java.util.Optional;

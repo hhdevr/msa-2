@@ -2,12 +2,12 @@ package com.chaykin.orderservice.controller;
 
 import com.chaykin.common.exception.GlobalExceptionHandler;
 import com.chaykin.common.exception.ServiceException;
-import com.chaykin.orderservice.controller.model.CreateOrderRequest;
-import com.chaykin.orderservice.controller.model.UpdateOrderRequest;
+import com.chaykin.common.model.order.CreateOrderRequest;
+import com.chaykin.common.model.order.OrderDto;
+import com.chaykin.common.model.order.UpdateOrderRequest;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.converter.OrderConverterImpl;
 import com.chaykin.orderservice.service.OrderService;
-import com.chaykin.orderservice.service.model.OrderDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.instancio.Instancio;

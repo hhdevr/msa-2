@@ -1,13 +1,13 @@
 package com.chaykin.orderservice.converter;
 
-import com.chaykin.orderservice.controller.model.CreateOrderItemRequest;
-import com.chaykin.orderservice.controller.model.CreateOrderRequest;
-import com.chaykin.orderservice.controller.model.UpdateOrderItemRequest;
-import com.chaykin.orderservice.controller.model.UpdateOrderRequest;
+import com.chaykin.common.model.order.CreateOrderItemRequest;
+import com.chaykin.common.model.order.CreateOrderRequest;
+import com.chaykin.common.model.order.OrderDto;
+import com.chaykin.common.model.order.OrderItemDto;
+import com.chaykin.common.model.order.UpdateOrderItemRequest;
+import com.chaykin.common.model.order.UpdateOrderRequest;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.model.OrderItem;
-import com.chaykin.orderservice.service.model.OrderDto;
-import com.chaykin.orderservice.service.model.OrderItemDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

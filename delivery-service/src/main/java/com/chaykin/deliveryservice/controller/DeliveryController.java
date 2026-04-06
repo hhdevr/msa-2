@@ -1,10 +1,11 @@
 package com.chaykin.deliveryservice.controller;
 
-import com.chaykin.deliveryservice.controller.model.CreateDeliveryRequest;
-import com.chaykin.deliveryservice.controller.model.UpdateDeliveryRequest;
+import com.chaykin.common.model.delivery.CreateDeliveryRequest;
+import com.chaykin.common.model.delivery.DeliveryDto;
+import com.chaykin.common.model.delivery.UpdateDeliveryRequest;
+import com.chaykin.deliveryservice.controller.docs.DeliveryApi;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
 import com.chaykin.deliveryservice.service.DeliveryService;
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,25 +27,26 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/deliveries",
-                produces = APPLICATION_JSON_VALUE)
-public class DeliveryController {
+@RequestMapping(path = "/deliveries", produces = APPLICATION_JSON_VALUE)
+public class DeliveryController implements DeliveryApi {
 
     private final DeliveryService service;
-
     private final DeliveryConverter converter;
 
+    @Override
     @GetMapping
     public ResponseEntity<List<DeliveryDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @Override
     @GetMapping("/{guid}")
     public ResponseEntity<DeliveryDto> getById(@PathVariable UUID guid) {
         log.info("GET delivery by id: {}", guid);
         return ResponseEntity.ok(service.getById(guid));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<DeliveryDto> create(@RequestBody CreateDeliveryRequest request) {
         DeliveryDto dto = converter.convert(request);
@@ -52,12 +54,14 @@ public class DeliveryController {
                              .body(service.create(dto));
     }
 
+    @Override
     @PutMapping("/{guid}")
     public ResponseEntity<DeliveryDto> update(@RequestBody UpdateDeliveryRequest request) {
         DeliveryDto dto = converter.convert(request);
         return ResponseEntity.ok(service.update(dto));
     }
 
+    @Override
     @DeleteMapping("/{guid}")
     public ResponseEntity<Void> delete(@PathVariable UUID guid) {
         service.delete(guid);

@@ -1,10 +1,10 @@
 package com.chaykin.deliveryservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.delivery.DeliveryDto;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
 import com.chaykin.deliveryservice.persistence.model.Delivery;
 import com.chaykin.deliveryservice.persistence.repository.DeliveryRepository;
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

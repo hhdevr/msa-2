@@ -1,0 +1,52 @@
+package com.chaykin.orderservice.integration;
+
+import com.chaykin.common.exception.ExceptionMessageModel;
+import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.payment.CreatePaymentRequest;
+import com.chaykin.common.model.payment.PaymentDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
+
+import java.nio.ByteBuffer;
+import java.util.Optional;
+
+import static com.chaykin.orderservice.exception.ErrorMessage.PAYMENT_REQUEST_FAILED;
+
+@Slf4j
+@Component
+@AllArgsConstructor
+public class PaymentClient {
+
+    private final PaymentFeignClient feignClient;
+    private final ObjectMapper mapper;
+
+    public PaymentDto createPayment(CreatePaymentRequest request) {
+        try {
+            return feignClient.createPayment(request);
+        } catch (FeignException ex) {
+            processException(ex);
+            throw new ServiceException(PAYMENT_REQUEST_FAILED, request.orderRefId());
+        }
+    }
+
+    private void processException(FeignException ex) {
+        HttpStatusCode statusCode = HttpStatusCode.valueOf(ex.status());
+        Optional<ByteBuffer> byteBuffer = ex.responseBody();
+
+        if (byteBuffer.isPresent()) {
+            try {
+                byte[] bytes = byteBuffer.get().array();
+                ExceptionMessageModel error = mapper.readValue(bytes, ExceptionMessageModel.class);
+                log.error("Payment service error [{}]: {}", statusCode, error.getMessage());
+            } catch (Exception e) {
+                log.error("Payment service error [{}]: unable to parse response", statusCode);
+            }
+        } else {
+            log.error("Payment service error [{}]: no response body", statusCode);
+        }
+    }
+}

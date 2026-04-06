@@ -1,10 +1,10 @@
 package com.chaykin.paymentservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.payment.PaymentDto;
 import com.chaykin.paymentservice.converter.PaymentConverter;
 import com.chaykin.paymentservice.persistence.model.Payment;
 import com.chaykin.paymentservice.persistence.repository.PaymentRepository;
-import com.chaykin.paymentservice.service.model.PaymentDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

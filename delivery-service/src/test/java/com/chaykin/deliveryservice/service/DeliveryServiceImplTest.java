@@ -1,11 +1,11 @@
 package com.chaykin.deliveryservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.delivery.DeliveryDto;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
 import com.chaykin.deliveryservice.converter.DeliveryConverterImpl;
 import com.chaykin.deliveryservice.persistence.model.Delivery;
 import com.chaykin.deliveryservice.persistence.repository.DeliveryRepository;
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

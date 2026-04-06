@@ -1,11 +1,11 @@
 package com.chaykin.paymentservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.payment.PaymentDto;
 import com.chaykin.paymentservice.converter.PaymentConverter;
 import com.chaykin.paymentservice.converter.PaymentConverterImpl;
 import com.chaykin.paymentservice.persistence.model.Payment;
 import com.chaykin.paymentservice.persistence.repository.PaymentRepository;
-import com.chaykin.paymentservice.service.model.PaymentDto;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

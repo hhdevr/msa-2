@@ -1,11 +1,15 @@
 package com.chaykin.orderservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.order.OrderDto;
+import com.chaykin.common.model.payment.CreatePaymentRequest;
+import com.chaykin.common.model.payment.PaymentMethod;
+import com.chaykin.common.model.payment.PaymentStatus;
 import com.chaykin.orderservice.converter.OrderConverter;
+import com.chaykin.orderservice.integration.PaymentClient;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.model.OrderItem;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
-import com.chaykin.orderservice.service.model.OrderDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository repository;
     private final OrderConverter converter;
+    private final PaymentClient paymentClient;
 
     @Override
     public List<OrderDto> findAll() {
@@ -61,6 +66,17 @@ public class OrderServiceImpl implements OrderService {
             entity.getItems().forEach(item -> item.setOrder(entity));
         }
         Order saved = repository.save(entity);
+
+        paymentClient.createPayment(new CreatePaymentRequest(
+                saved.getGuid(),
+                saved.getTotalAmount(),
+                saved.getCurrency(),
+                PaymentMethod.CREDIT_CARD,
+                PaymentStatus.PENDING,
+                null,
+                null
+        ));
+
         return converter.convert(saved);
     }
 

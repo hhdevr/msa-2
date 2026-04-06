@@ -17,3 +17,10 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  mvc:
+    servlet:
+      path: /api/v1
+
+integration:
+  payment-service:
+    url: http://localhost:8082/api/v1

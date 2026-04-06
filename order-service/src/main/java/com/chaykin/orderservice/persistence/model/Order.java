@@ -45,7 +45,7 @@ public class Order {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private OrderStatus status;
+    private com.chaykin.common.model.order.OrderStatus status;
 
     @Column(nullable = false, precision = 12, scale = 2, name = "total_amount")
     private BigDecimal totalAmount;
