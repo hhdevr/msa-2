@@ -1,0 +1,15 @@
+services:
+  order-service:
+    image: msa2-order:1.0
+    ports:
+      - "8081:8081"
+
+  payment-service:
+    image: msa2-payment:1.0
+    ports:
+      - "8082:8082"
+
+  delivery-service:
+    image: msa2-delivery:1.0
+    ports:
+      - "8083:8083"
