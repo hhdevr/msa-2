@@ -36,7 +36,7 @@ public interface DeliveryApi {
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "404", description = "Delivery not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    ResponseEntity<DeliveryDto> update(UpdateDeliveryRequest request);
+    ResponseEntity<DeliveryDto> update(UUID guid, UpdateDeliveryRequest request);
 
     @Operation(summary = "Delete a delivery (soft delete)")
     @ApiResponse(responseCode = "204", description = "Delivery deleted")
