@@ -6,6 +6,8 @@ import com.chaykin.common.model.payment.CreatePaymentRequest;
 import com.chaykin.common.model.payment.PaymentDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.chaykin.orderservice.exception.ErrorMessage.PAYMENT_REQUEST_FAILED;
 
@@ -24,9 +27,12 @@ public class PaymentClient {
     private final PaymentFeignClient feignClient;
     private final ObjectMapper mapper;
 
+    @Retry(name = "paymentServiceRetry")
+    @CircuitBreaker(name = "paymentServiceCB")
     public PaymentDto createPayment(CreatePaymentRequest request) {
         try {
-            return feignClient.createPayment(request.orderRefId(), request);
+            log.info("Calling payment-service for order {}", request.orderRefId());
+            return feignClient.createPayment(UUID.randomUUID(), request);
         } catch (FeignException ex) {
             processException(ex);
             throw new ServiceException(PAYMENT_REQUEST_FAILED, request.orderRefId());

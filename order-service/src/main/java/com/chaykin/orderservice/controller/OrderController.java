@@ -6,6 +6,7 @@ import com.chaykin.common.model.order.UpdateOrderRequest;
 import com.chaykin.orderservice.controller.docs.OrderApi;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,12 +36,14 @@ public class OrderController implements OrderApi {
 
     @Override
     @GetMapping
+    @CircuitBreaker(name = "orderControllerCB", fallbackMethod = "findAllFallback")
     public ResponseEntity<List<OrderDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @Override
     @GetMapping("/{guid}")
+    @CircuitBreaker(name = "orderControllerCB", fallbackMethod = "getByIdFallback")
     public ResponseEntity<OrderDto> getById(@PathVariable UUID guid) {
         log.info("GET order by id: {}", guid);
         return ResponseEntity.ok(service.getById(guid));
@@ -48,6 +51,7 @@ public class OrderController implements OrderApi {
 
     @Override
     @PostMapping
+    @CircuitBreaker(name = "orderControllerCB", fallbackMethod = "createFallback")
     public ResponseEntity<OrderDto> create(@RequestBody CreateOrderRequest request) {
         OrderDto dto = converter.convert(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,15 +60,44 @@ public class OrderController implements OrderApi {
 
     @Override
     @PutMapping("/{guid}")
-    public ResponseEntity<OrderDto> update(@RequestBody UpdateOrderRequest request) {
+    @CircuitBreaker(name = "orderControllerCB", fallbackMethod = "updateFallback")
+    public ResponseEntity<OrderDto> update(@PathVariable UUID guid,
+                                           @RequestBody UpdateOrderRequest request) {
         OrderDto dto = converter.convert(request);
         return ResponseEntity.ok(service.update(dto));
     }
 
     @Override
     @DeleteMapping("/{guid}")
+    @CircuitBreaker(name = "orderControllerCB", fallbackMethod = "deleteFallback")
     public ResponseEntity<Void> delete(@PathVariable UUID guid) {
         service.delete(guid);
         return ResponseEntity.noContent().build();
     }
+
+    private ResponseEntity<List<OrderDto>> findAllFallback(Throwable t) {
+        log.warn("Circuit breaker open for findAll: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<OrderDto> getByIdFallback(UUID guid, Throwable t) {
+        log.warn("Circuit breaker open for getById {}: {}", guid, t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<OrderDto> createFallback(CreateOrderRequest request, Throwable t) {
+        log.warn("Circuit breaker open for create: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<OrderDto> updateFallback(UUID guid, UpdateOrderRequest request, Throwable t) {
+        log.warn("Circuit breaker open for update: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<Void> deleteFallback(UUID guid, Throwable t) {
+        log.warn("Circuit breaker open for delete {}: {}", guid, t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
 }

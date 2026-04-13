@@ -6,6 +6,7 @@ import com.chaykin.common.model.payment.UpdatePaymentRequest;
 import com.chaykin.paymentservice.controller.docs.PaymentApi;
 import com.chaykin.paymentservice.converter.PaymentConverter;
 import com.chaykin.paymentservice.service.PaymentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,12 +36,14 @@ public class PaymentController implements PaymentApi {
 
     @Override
     @GetMapping
+    @CircuitBreaker(name = "paymentControllerCB", fallbackMethod = "findAllFallback")
     public ResponseEntity<List<PaymentDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @Override
     @GetMapping("/{guid}")
+    @CircuitBreaker(name = "paymentControllerCB", fallbackMethod = "getByIdFallback")
     public ResponseEntity<PaymentDto> getById(@PathVariable UUID guid) {
         log.info("GET payment by id: {}", guid);
         return ResponseEntity.ok(service.getById(guid));
@@ -48,6 +51,7 @@ public class PaymentController implements PaymentApi {
 
     @Override
     @PostMapping
+    @CircuitBreaker(name = "paymentControllerCB", fallbackMethod = "createFallback")
     public ResponseEntity<PaymentDto> create(@RequestBody CreatePaymentRequest request) {
         PaymentDto dto = converter.convert(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,15 +60,43 @@ public class PaymentController implements PaymentApi {
 
     @Override
     @PutMapping("/{guid}")
-    public ResponseEntity<PaymentDto> update(@RequestBody UpdatePaymentRequest request) {
+    @CircuitBreaker(name = "paymentControllerCB", fallbackMethod = "updateFallback")
+    public ResponseEntity<PaymentDto> update(@PathVariable UUID guid,
+                                             @RequestBody UpdatePaymentRequest request) {
         PaymentDto dto = converter.convert(request);
         return ResponseEntity.ok(service.update(dto));
     }
 
     @Override
     @DeleteMapping("/{guid}")
+    @CircuitBreaker(name = "paymentControllerCB", fallbackMethod = "deleteFallback")
     public ResponseEntity<Void> delete(@PathVariable UUID guid) {
         service.delete(guid);
         return ResponseEntity.noContent().build();
+    }
+
+    private ResponseEntity<List<PaymentDto>> findAllFallback(Throwable t) {
+        log.warn("Circuit breaker open for findAll: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<PaymentDto> getByIdFallback(UUID guid, Throwable t) {
+        log.warn("Circuit breaker open for getById {}: {}", guid, t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<PaymentDto> createFallback(CreatePaymentRequest request, Throwable t) {
+        log.warn("Circuit breaker open for create: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<PaymentDto> updateFallback(UUID guid, UpdatePaymentRequest request, Throwable t) {
+        log.warn("Circuit breaker open for update: {}", t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
+
+    private ResponseEntity<Void> deleteFallback(UUID guid, Throwable t) {
+        log.warn("Circuit breaker open for delete {}: {}", guid, t.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 }

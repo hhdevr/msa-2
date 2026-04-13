@@ -36,7 +36,7 @@ public interface OrderApi {
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "404", description = "Order not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    ResponseEntity<OrderDto> update(UpdateOrderRequest request);
+    ResponseEntity<OrderDto> update(UUID guid, UpdateOrderRequest request);
 
     @Operation(summary = "Delete an order (soft delete)")
     @ApiResponse(responseCode = "204", description = "Order deleted")
