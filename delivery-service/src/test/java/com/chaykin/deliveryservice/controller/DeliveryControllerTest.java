@@ -2,12 +2,12 @@ package com.chaykin.deliveryservice.controller;
 
 import com.chaykin.common.exception.GlobalExceptionHandler;
 import com.chaykin.common.exception.ServiceException;
-import com.chaykin.deliveryservice.controller.model.CreateDeliveryRequest;
-import com.chaykin.deliveryservice.controller.model.UpdateDeliveryRequest;
+import com.chaykin.common.model.delivery.CreateDeliveryRequest;
+import com.chaykin.common.model.delivery.DeliveryDto;
+import com.chaykin.common.model.delivery.UpdateDeliveryRequest;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
 import com.chaykin.deliveryservice.converter.DeliveryConverterImpl;
 import com.chaykin.deliveryservice.service.DeliveryService;
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.instancio.Instancio;

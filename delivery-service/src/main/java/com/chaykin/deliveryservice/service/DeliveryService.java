@@ -1,6 +1,6 @@
 package com.chaykin.deliveryservice.service;
 
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
+import com.chaykin.common.model.delivery.DeliveryDto;
 
 import java.util.List;
 import java.util.Optional;

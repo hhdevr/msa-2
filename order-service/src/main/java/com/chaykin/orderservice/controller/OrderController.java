@@ -1,10 +1,11 @@
 package com.chaykin.orderservice.controller;
 
-import com.chaykin.orderservice.controller.model.CreateOrderRequest;
-import com.chaykin.orderservice.controller.model.UpdateOrderRequest;
+import com.chaykin.common.model.order.CreateOrderRequest;
+import com.chaykin.common.model.order.OrderDto;
+import com.chaykin.common.model.order.UpdateOrderRequest;
+import com.chaykin.orderservice.controller.docs.OrderApi;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.service.OrderService;
-import com.chaykin.orderservice.service.model.OrderDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,25 +27,26 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/orders",
-                produces = APPLICATION_JSON_VALUE)
-public class OrderController {
+@RequestMapping(path = "/orders", produces = APPLICATION_JSON_VALUE)
+public class OrderController implements OrderApi {
 
     private final OrderService service;
-
     private final OrderConverter converter;
 
+    @Override
     @GetMapping
     public ResponseEntity<List<OrderDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @Override
     @GetMapping("/{guid}")
     public ResponseEntity<OrderDto> getById(@PathVariable UUID guid) {
         log.info("GET order by id: {}", guid);
         return ResponseEntity.ok(service.getById(guid));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<OrderDto> create(@RequestBody CreateOrderRequest request) {
         OrderDto dto = converter.convert(request);
@@ -52,12 +54,14 @@ public class OrderController {
                              .body(service.create(dto));
     }
 
+    @Override
     @PutMapping("/{guid}")
     public ResponseEntity<OrderDto> update(@RequestBody UpdateOrderRequest request) {
         OrderDto dto = converter.convert(request);
         return ResponseEntity.ok(service.update(dto));
     }
 
+    @Override
     @DeleteMapping("/{guid}")
     public ResponseEntity<Void> delete(@PathVariable UUID guid) {
         service.delete(guid);

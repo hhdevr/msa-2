@@ -1,11 +1,12 @@
 package com.chaykin.orderservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.order.OrderDto;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.converter.OrderConverterImpl;
+import com.chaykin.orderservice.integration.PaymentClient;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
-import com.chaykin.orderservice.service.model.OrderDto;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,12 +35,15 @@ class OrderServiceImplTest {
     @Mock
     private OrderRepository orderRepository;
 
+    @Mock
+    private PaymentClient paymentClient;
+
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
         OrderConverter orderConverter = new OrderConverterImpl();
-        orderService = new OrderServiceImpl(orderRepository, orderConverter);
+        orderService = new OrderServiceImpl(orderRepository, orderConverter, paymentClient);
     }
 
     @Nested

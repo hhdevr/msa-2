@@ -2,12 +2,12 @@ package com.chaykin.paymentservice.controller;
 
 import com.chaykin.common.exception.GlobalExceptionHandler;
 import com.chaykin.common.exception.ServiceException;
-import com.chaykin.paymentservice.controller.model.CreatePaymentRequest;
-import com.chaykin.paymentservice.controller.model.UpdatePaymentRequest;
+import com.chaykin.common.model.payment.CreatePaymentRequest;
+import com.chaykin.common.model.payment.PaymentDto;
+import com.chaykin.common.model.payment.UpdatePaymentRequest;
 import com.chaykin.paymentservice.converter.PaymentConverter;
 import com.chaykin.paymentservice.converter.PaymentConverterImpl;
 import com.chaykin.paymentservice.service.PaymentService;
-import com.chaykin.paymentservice.service.model.PaymentDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.instancio.Instancio;

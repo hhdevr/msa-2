@@ -47,7 +47,7 @@ public class Delivery {
 
     @Enumerated(STRING)
     @Column(nullable = false)
-    private DeliveryStatus status;
+    private com.chaykin.common.model.delivery.DeliveryStatus status;
 
     @Column(nullable = false)
     private boolean active = true;

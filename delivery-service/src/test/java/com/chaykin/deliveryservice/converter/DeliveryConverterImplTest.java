@@ -1,11 +1,11 @@
 package com.chaykin.deliveryservice.converter;
 
-import com.chaykin.deliveryservice.controller.model.CreateDeliveryRequest;
-import com.chaykin.deliveryservice.controller.model.UpdateDeliveryRequest;
+import com.chaykin.common.model.delivery.AddressDto;
+import com.chaykin.common.model.delivery.CreateDeliveryRequest;
+import com.chaykin.common.model.delivery.DeliveryDto;
+import com.chaykin.common.model.delivery.UpdateDeliveryRequest;
 import com.chaykin.deliveryservice.persistence.model.Address;
 import com.chaykin.deliveryservice.persistence.model.Delivery;
-import com.chaykin.deliveryservice.service.model.AddressDto;
-import com.chaykin.deliveryservice.service.model.DeliveryDto;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

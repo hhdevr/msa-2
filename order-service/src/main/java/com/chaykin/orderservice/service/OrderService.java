@@ -1,6 +1,6 @@
 package com.chaykin.orderservice.service;
 
-import com.chaykin.orderservice.service.model.OrderDto;
+import com.chaykin.common.model.order.OrderDto;
 
 import java.util.List;
 import java.util.Optional;
