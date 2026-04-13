@@ -59,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
         Order entity = converter.convert(dto);
         entity.setActive(true);
         if (dto.items() != null) {
-            List<OrderItem> items = dto.items().stream()
+            List<OrderItem> items = dto.items()
+                                       .stream()
                                        .map(converter::convert)
                                        .toList();
             entity.getItems().addAll(items);

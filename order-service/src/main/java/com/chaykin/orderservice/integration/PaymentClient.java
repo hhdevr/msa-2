@@ -26,7 +26,7 @@ public class PaymentClient {
 
     public PaymentDto createPayment(CreatePaymentRequest request) {
         try {
-            return feignClient.createPayment(request);
+            return feignClient.createPayment(request.orderRefId(), request);
         } catch (FeignException ex) {
             processException(ex);
             throw new ServiceException(PAYMENT_REQUEST_FAILED, request.orderRefId());
