@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorMessage implements ErrorCode {
 
     NULL_ID(HttpStatus.BAD_REQUEST, "ID cannot be null", 101),
-    PAYMENT_NOT_EXIST(HttpStatus.NOT_FOUND, "Payment id=%s does not exist", 102);
+    PAYMENT_NOT_EXIST(HttpStatus.NOT_FOUND, "Payment id=%s does not exist", 102),
+
+    IDEMPOTENCY_KEY_EXISTS(HttpStatus.CONFLICT, "Idempotency key %s already exists", 103),
+    IDEMPOTENCY_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "Idempotency key %s not found", 104);
 
     private final HttpStatus status;
     private final String message;
