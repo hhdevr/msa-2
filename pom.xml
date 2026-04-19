@@ -30,6 +30,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <instancio.version>5.5.1</instancio.version>
         <resilience4j.version>2.4.0</resilience4j.version>
+        <bucket4j.version>8.10.1</bucket4j.version>
     </properties>
 
     <dependencyManagement>

@@ -36,6 +36,7 @@ public interface OrderConverter {
     @Mapping(target = "updatedAt", ignore = true)
     OrderDto convert(CreateOrderRequest request);
 
+    @Mapping(target = "guid", ignore = true)
     OrderItemDto convert(CreateOrderItemRequest request);
 
     @Mapping(target = "createdAt", ignore = true)

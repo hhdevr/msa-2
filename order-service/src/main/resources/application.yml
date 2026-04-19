@@ -59,3 +59,15 @@ resilience4j:
           - feign.FeignException
         ignoreExceptions:
           - com.chaykin.common.exception.ServiceException
+  ratelimiter:
+    instances:
+      paymentClientRL:
+        registerHealthIndicator: true
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0s
+  bulkhead:
+    instances:
+      paymentClientBH:
+        maxConcurrentCalls: 5
+        maxWaitDuration: 0ms
