@@ -24,3 +24,38 @@ spring:
 integration:
   payment-service:
     url: http://localhost:8082/api/v1
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      orderControllerCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - java.lang.Exception
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException
+      paymentServiceCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - feign.FeignException
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException
+  retry:
+    instances:
+      paymentServiceRetry:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - feign.FeignException
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException

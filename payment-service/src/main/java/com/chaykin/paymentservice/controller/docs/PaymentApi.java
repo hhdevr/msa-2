@@ -36,7 +36,7 @@ public interface PaymentApi {
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "404", description = "Payment not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    ResponseEntity<PaymentDto> update(UpdatePaymentRequest request);
+    ResponseEntity<PaymentDto> update(UUID guid, UpdatePaymentRequest request);
 
     @Operation(summary = "Delete a payment (soft delete)")
     @ApiResponse(responseCode = "204", description = "Payment deleted")

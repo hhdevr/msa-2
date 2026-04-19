@@ -20,3 +20,18 @@ spring:
   mvc:
     servlet:
       path: /api/v1
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      deliveryControllerCB:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
+        recordExceptions:
+          - java.lang.Exception
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException
