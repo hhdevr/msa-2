@@ -68,15 +68,17 @@ public class OrderServiceImpl implements OrderService {
         }
         Order saved = repository.save(entity);
 
-        paymentClient.createPayment(new CreatePaymentRequest(
-                saved.getGuid(),
-                saved.getTotalAmount(),
-                saved.getCurrency(),
-                PaymentMethod.CREDIT_CARD,
-                PaymentStatus.PENDING,
-                null,
-                null
-        ));
+        UUID idempotencyKey = UUID.randomUUID();
+        paymentClient.createPayment(idempotencyKey,
+                                    new CreatePaymentRequest(
+                                            saved.getGuid(),
+                                            saved.getTotalAmount(),
+                                            saved.getCurrency(),
+                                            PaymentMethod.CREDIT_CARD,
+                                            PaymentStatus.PENDING,
+                                            null,
+                                            null
+                                    ));
 
         return converter.convert(saved);
     }

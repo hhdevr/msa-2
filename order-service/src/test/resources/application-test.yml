@@ -1,0 +1,47 @@
+integration:
+  payment-service:
+    url: http://localhost:${wiremock.server.port}/api/v1
+
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            connect-timeout: 500
+            read-timeout: 500
+
+resilience4j:
+  retry:
+    instances:
+      paymentServiceRetry:
+        maxAttempts: 3
+        waitDuration: 50ms
+        retryExceptions:
+          - feign.FeignException$InternalServerError
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException
+  circuitbreaker:
+    instances:
+      paymentServiceCB:
+        registerHealthIndicator: false
+        slidingWindowSize: 10
+        failureRateThreshold: 100
+        waitDurationInOpenState: 1s
+        minimumNumberOfCalls: 100
+        recordExceptions:
+          - feign.FeignException
+        ignoreExceptions:
+          - com.chaykin.common.exception.ServiceException
+  ratelimiter:
+    instances:
+      paymentClientRL:
+        registerHealthIndicator: false
+        limitForPeriod: 1000
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0s
+  bulkhead:
+    instances:
+      paymentClientBH:
+        maxConcurrentCalls: 100
+        maxWaitDuration: 0ms
