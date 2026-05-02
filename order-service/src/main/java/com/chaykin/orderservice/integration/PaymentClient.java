@@ -6,7 +6,9 @@ import com.chaykin.common.model.payment.CreatePaymentRequest;
 import com.chaykin.common.model.payment.PaymentDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class PaymentClient {
     private final PaymentFeignClient feignClient;
     private final ObjectMapper mapper;
 
+    @RateLimiter(name = "paymentClientRL")
+    @Bulkhead(name = "paymentClientBH")
     @Retry(name = "paymentServiceRetry")
     @CircuitBreaker(name = "paymentServiceCB")
     public PaymentDto createPayment(CreatePaymentRequest request) {
