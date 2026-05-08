@@ -20,6 +20,21 @@ spring:
   mvc:
     servlet:
       path: /api/v1
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+
+rabbitmq:
+  service:
+    order:
+      exchange-request-name: payment-request-exchange
+      queue-request-name: payment-request-queue
+      exchange-response-name: payment-response-exchange
+      queue-response-name: payment-response-queue
+      dlx-name: payment-request-dlx
+      dlq-name: payment-request-dlq
 
 resilience4j:
   circuitbreaker:

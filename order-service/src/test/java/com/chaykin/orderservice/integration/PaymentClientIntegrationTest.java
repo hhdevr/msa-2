@@ -83,7 +83,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when
-            PaymentDto result = paymentClient.createPayment(request);
+            PaymentDto result = paymentClient.createPayment(UUID.randomUUID(), request);
 
             // then
             assertThat(result).isNotNull();
@@ -99,7 +99,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when
-            paymentClient.createPayment(request);
+            paymentClient.createPayment(UUID.randomUUID(), request);
 
             // then
             wireMockServer.verify(postRequestedFor(urlEqualTo(PAYMENTS_URL))
@@ -117,7 +117,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when & then
-            assertThatThrownBy(() -> paymentClient.createPayment(request))
+            assertThatThrownBy(() -> paymentClient.createPayment(UUID.randomUUID(), request))
                     .isInstanceOf(FeignException.InternalServerError.class);
             wireMockServer.verify(3, postRequestedFor(urlEqualTo(PAYMENTS_URL)));
         }
@@ -152,7 +152,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when
-            PaymentDto result = paymentClient.createPayment(request);
+            PaymentDto result = paymentClient.createPayment(UUID.randomUUID(), request);
 
             // then
             assertThat(result).isNotNull();
@@ -170,7 +170,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when & then
-            assertThatThrownBy(() -> paymentClient.createPayment(request))
+            assertThatThrownBy(() -> paymentClient.createPayment(UUID.randomUUID(), request))
                     .isInstanceOf(FeignException.NotFound.class);
             wireMockServer.verify(1, postRequestedFor(urlEqualTo(PAYMENTS_URL)));
         }
@@ -182,7 +182,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when
-            paymentClient.createPayment(request);
+            paymentClient.createPayment(UUID.randomUUID(), request);
 
             // then
             wireMockServer.verify(0, getRequestedFor(urlEqualTo(PAYMENTS_URL)));
@@ -200,7 +200,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when & then
-            assertThatThrownBy(() -> paymentClient.createPayment(request))
+            assertThatThrownBy(() -> paymentClient.createPayment(UUID.randomUUID(), request))
                     .isInstanceOf(RetryableException.class)
                     .hasMessageContaining("timed out");
         }
@@ -215,7 +215,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when & then
-            assertThatThrownBy(() -> paymentClient.createPayment(request))
+            assertThatThrownBy(() -> paymentClient.createPayment(UUID.randomUUID(), request))
                     .isInstanceOf(FeignException.Conflict.class);
             wireMockServer.verify(1, postRequestedFor(urlEqualTo(PAYMENTS_URL)));
         }
@@ -227,7 +227,7 @@ class PaymentClientIntegrationTest {
             CreatePaymentRequest request = buildRequest();
 
             // when
-            PaymentDto result = paymentClient.createPayment(request);
+            PaymentDto result = paymentClient.createPayment(UUID.randomUUID(), request);
 
             // then
             assertThat(result.guid()).isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));

@@ -19,4 +19,6 @@ public interface OrderService {
     OrderDto update(OrderDto dto);
 
     void delete(UUID guid);
+
+    void applyPaymentResult(UUID guid, boolean success);
 }
