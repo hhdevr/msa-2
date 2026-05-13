@@ -13,5 +13,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     boolean existsByGuid(UUID guid);
 
+    Optional<Payment> findByOrderRefId(UUID orderRefId);
+
     List<Payment> findAllByActiveTrue();
 }

@@ -1,18 +1,19 @@
 package com.chaykin.orderservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.messaging.PaymentRequestMessage;
 import com.chaykin.common.model.order.OrderDto;
-import com.chaykin.common.model.payment.CreatePaymentRequest;
+import com.chaykin.common.model.order.OrderStatus;
 import com.chaykin.common.model.payment.PaymentMethod;
-import com.chaykin.common.model.payment.PaymentStatus;
 import com.chaykin.orderservice.converter.OrderConverter;
-import com.chaykin.orderservice.integration.PaymentClient;
+import com.chaykin.orderservice.messaging.payment.producer.PaymentRequestProducer;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.model.OrderItem;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository repository;
     private final OrderConverter converter;
-    private final PaymentClient paymentClient;
+    private final PaymentRequestProducer paymentRequestProducer;
 
     @Override
     public List<OrderDto> findAll() {
@@ -54,10 +55,12 @@ public class OrderServiceImpl implements OrderService {
                                            }));
     }
 
+    @Transactional
     @Override
     public OrderDto create(OrderDto dto) {
         Order entity = converter.convert(dto);
         entity.setActive(true);
+        entity.setStatus(OrderStatus.PROCESSING);
         if (dto.items() != null) {
             List<OrderItem> items = dto.items()
                                        .stream()
@@ -68,17 +71,10 @@ public class OrderServiceImpl implements OrderService {
         }
         Order saved = repository.save(entity);
 
-        UUID idempotencyKey = UUID.randomUUID();
-        paymentClient.createPayment(idempotencyKey,
-                                    new CreatePaymentRequest(
-                                            saved.getGuid(),
-                                            saved.getTotalAmount(),
-                                            saved.getCurrency(),
-                                            PaymentMethod.CREDIT_CARD,
-                                            PaymentStatus.PENDING,
-                                            null,
-                                            null
-                                    ));
+        paymentRequestProducer.send(new PaymentRequestMessage(saved.getGuid(),
+                                                              saved.getTotalAmount(),
+                                                              saved.getCurrency(),
+                                                              PaymentMethod.CREDIT_CARD));
 
         return converter.convert(saved);
     }
@@ -111,5 +107,18 @@ public class OrderServiceImpl implements OrderService {
                                  });
         entity.setActive(false);
         repository.save(entity);
+    }
+
+    @Transactional
+    @Override
+    public void applyPaymentResult(UUID guid, boolean success) {
+        Order order = repository.findByGuid(guid)
+                                .orElseThrow(() -> {
+                                    log.error("Order {} not found while applying payment result", guid);
+                                    return new ServiceException(ORDER_NOT_EXIST, guid);
+                                });
+        order.setStatus(success ? OrderStatus.PAID : OrderStatus.CANCELLED);
+        repository.save(order);
+        log.info("Order {} status updated to {}", guid, order.getStatus());
     }
 }

@@ -4,7 +4,7 @@ import com.chaykin.common.exception.ServiceException;
 import com.chaykin.common.model.order.OrderDto;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.converter.OrderConverterImpl;
-import com.chaykin.orderservice.integration.PaymentClient;
+import com.chaykin.orderservice.messaging.payment.producer.PaymentRequestProducer;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
 import org.instancio.Instancio;
@@ -36,14 +36,14 @@ class OrderServiceImplTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private PaymentClient paymentClient;
+    private PaymentRequestProducer paymentRequestProducer;
 
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
         OrderConverter orderConverter = new OrderConverterImpl();
-        orderService = new OrderServiceImpl(orderRepository, orderConverter, paymentClient);
+        orderService = new OrderServiceImpl(orderRepository, orderConverter, paymentRequestProducer);
     }
 
     @Nested
