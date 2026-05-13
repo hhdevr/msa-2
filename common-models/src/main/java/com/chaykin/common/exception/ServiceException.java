@@ -11,28 +11,44 @@ public class ServiceException extends RuntimeException {
     private final int code;
 
     public ServiceException(ErrorCode error) {
-        super(error.getMessage());
+        this(error, (Throwable) null);
+    }
+
+    public ServiceException(ErrorCode error, UUID value) {
+        this(error, value, null);
+    }
+
+    public ServiceException(ErrorCode error, String value) {
+        this(error, value, null);
+    }
+
+    public ServiceException(ErrorCode error, long value) {
+        this(error, value, null);
+    }
+
+    public ServiceException(ErrorCode error, Throwable cause) {
+        super(error.getMessage(), cause);
         this.status = error.getStatus();
         this.message = error.getMessage();
         this.code = error.getCode();
     }
 
-    public ServiceException(ErrorCode error, UUID value) {
-        super(String.format(error.getMessage(), value));
+    public ServiceException(ErrorCode error, UUID value, Throwable cause) {
+        super(String.format(error.getMessage(), value), cause);
         this.status = error.getStatus();
         this.message = String.format(error.getMessage(), value);
         this.code = error.getCode();
     }
 
-    public ServiceException(ErrorCode error, String value) {
-        super(String.format(error.getMessage(), value));
+    public ServiceException(ErrorCode error, String value, Throwable cause) {
+        super(String.format(error.getMessage(), value), cause);
         this.status = error.getStatus();
         this.message = String.format(error.getMessage(), value);
         this.code = error.getCode();
     }
 
-    public ServiceException(ErrorCode error, long value) {
-        super(String.format(error.getMessage(), value));
+    public ServiceException(ErrorCode error, long value, Throwable cause) {
+        super(String.format(error.getMessage(), value), cause);
         this.status = error.getStatus();
         this.message = String.format(error.getMessage(), value);
         this.code = error.getCode();
