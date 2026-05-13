@@ -33,10 +33,10 @@ public class Delivery {
     @Column(nullable = false, unique = true)
     private UUID guid;
 
-    @Column(nullable = false, name = "order_ref_id")
+    @Column(nullable = false, unique = true, name = "order_ref_id")
     private UUID orderRefId;
 
-    @Column(nullable = false, name = "recipient_name")
+    @Column(name = "recipient_name")
     private String recipientName;
 
     @Column(name = "recipient_phone")

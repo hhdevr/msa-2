@@ -1,11 +1,13 @@
 package com.chaykin.orderservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.messaging.OrderPaidMessage;
 import com.chaykin.common.model.messaging.PaymentRequestMessage;
 import com.chaykin.common.model.order.OrderDto;
 import com.chaykin.common.model.order.OrderStatus;
 import com.chaykin.common.model.payment.PaymentMethod;
 import com.chaykin.orderservice.converter.OrderConverter;
+import com.chaykin.orderservice.messaging.delivery.producer.OrderPaidProducer;
 import com.chaykin.orderservice.messaging.payment.producer.PaymentRequestProducer;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.model.OrderItem;
@@ -29,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
     private final OrderConverter converter;
     private final PaymentRequestProducer paymentRequestProducer;
+    private final OrderPaidProducer orderPaidProducer;
 
     @Override
     public List<OrderDto> findAll() {
@@ -120,5 +123,9 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(success ? OrderStatus.PAID : OrderStatus.CANCELLED);
         repository.save(order);
         log.info("Order {} status updated to {}", guid, order.getStatus());
+
+        if (order.getStatus() == OrderStatus.PAID) {
+            orderPaidProducer.send(new OrderPaidMessage(order.getGuid()));
+        }
     }
 }

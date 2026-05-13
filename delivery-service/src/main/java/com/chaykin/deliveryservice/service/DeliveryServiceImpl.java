@@ -2,12 +2,16 @@ package com.chaykin.deliveryservice.service;
 
 import com.chaykin.common.exception.ServiceException;
 import com.chaykin.common.model.delivery.DeliveryDto;
+import com.chaykin.common.model.delivery.DeliveryStatus;
+import com.chaykin.common.model.messaging.DeliveryCreatedMessage;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
+import com.chaykin.deliveryservice.messaging.order.producer.DeliveryCreatedProducer;
 import com.chaykin.deliveryservice.persistence.model.Delivery;
 import com.chaykin.deliveryservice.persistence.repository.DeliveryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +26,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     private final DeliveryRepository repository;
     private final DeliveryConverter converter;
+    private final DeliveryCreatedProducer deliveryCreatedProducer;
 
     @Override
     public List<DeliveryDto> findAll() {
@@ -53,6 +58,26 @@ public class DeliveryServiceImpl implements DeliveryService {
         var entity = converter.convert(dto);
         entity.setActive(true);
         var saved = repository.save(entity);
+        return converter.convert(saved);
+    }
+
+    @Transactional
+    @Override
+    public DeliveryDto createForPaidOrder(UUID orderRefId) {
+        Delivery saved = repository.findByOrderRefId(orderRefId)
+                                   .orElseGet(() -> {
+                                       Delivery entity = new Delivery();
+                                       entity.setOrderRefId(orderRefId);
+                                       entity.setStatus(DeliveryStatus.CREATED);
+                                       entity.setActive(true);
+                                       Delivery persisted = repository.save(entity);
+                                       log.info("Created delivery {} for paid order {}",
+                                                persisted.getGuid(), orderRefId);
+                                       return persisted;
+                                   });
+
+        deliveryCreatedProducer.send(new DeliveryCreatedMessage(saved.getOrderRefId(), saved.getGuid()));
+
         return converter.convert(saved);
     }
 

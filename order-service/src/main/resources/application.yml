@@ -25,6 +25,25 @@ spring:
     port: 5672
     username: admin
     password: admin
+  kafka:
+    bootstrap-servers: localhost:9093
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      ack-mode: manual
+      observation-enabled: true
+    template:
+      observation-enabled: true
+    consumer:
+      group-id: order-consumers
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: "*"
 
 integration:
   payment-service:
@@ -39,6 +58,12 @@ rabbitmq:
       queue-response-name: payment-response-queue
       dlx-name: payment-response-dlx
       dlq-name: payment-response-dlq
+
+kafka:
+  service:
+    delivery:
+      order-paid-topic: order.paid
+      delivery-created-topic: delivery.created
 
 resilience4j:
   circuitbreaker:

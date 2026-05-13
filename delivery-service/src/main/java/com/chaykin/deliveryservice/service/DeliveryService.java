@@ -16,6 +16,8 @@ public interface DeliveryService {
 
     DeliveryDto create(DeliveryDto dto);
 
+    DeliveryDto createForPaidOrder(UUID orderRefId);
+
     DeliveryDto update(DeliveryDto dto);
 
     void delete(UUID guid);
