@@ -1,27 +1,33 @@
 package com.chaykin.orderservice.service;
 
 import com.chaykin.common.exception.ServiceException;
+import com.chaykin.common.model.messaging.AsyncMessageStatus;
+import com.chaykin.common.model.messaging.AsyncMessageType;
 import com.chaykin.common.model.messaging.OrderPaidMessage;
 import com.chaykin.common.model.messaging.PaymentRequestMessage;
 import com.chaykin.common.model.order.OrderDto;
 import com.chaykin.common.model.order.OrderStatus;
 import com.chaykin.common.model.payment.PaymentMethod;
 import com.chaykin.orderservice.converter.OrderConverter;
-import com.chaykin.orderservice.messaging.delivery.producer.OrderPaidProducer;
+import com.chaykin.orderservice.messaging.delivery.config.properties.KafkaDeliveryServiceProperties;
 import com.chaykin.orderservice.messaging.payment.producer.PaymentRequestProducer;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.model.OrderItem;
+import com.chaykin.orderservice.persistence.model.async.AsyncMessage;
+import com.chaykin.orderservice.persistence.model.async.AsyncMessageId;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.chaykin.orderservice.exception.ErrorMessage.ORDER_NOT_EXIST;
+import static com.chaykin.orderservice.exception.ErrorMessage.OUTBOX_SERIALIZATION_FAILED;
 
 @Slf4j
 @Service
@@ -31,7 +37,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
     private final OrderConverter converter;
     private final PaymentRequestProducer paymentRequestProducer;
-    private final OrderPaidProducer orderPaidProducer;
+    private final AsyncMessageService asyncMessageService;
+    private final KafkaDeliveryServiceProperties kafkaDeliveryServiceProperties;
+    private final JsonMapper jsonMapper;
 
     @Override
     public List<OrderDto> findAll() {
@@ -125,7 +133,31 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order {} status updated to {}", guid, order.getStatus());
 
         if (order.getStatus() == OrderStatus.PAID) {
-            orderPaidProducer.send(new OrderPaidMessage(order.getGuid()));
+            stageOrderPaidOutboxMessage(order);
         }
+    }
+
+    private void stageOrderPaidOutboxMessage(Order order) {
+        OrderPaidMessage payload = new OrderPaidMessage(order.getGuid());
+
+        String json;
+        try {
+            json = jsonMapper.writeValueAsString(payload);
+        } catch (RuntimeException e) {
+            throw new ServiceException(OUTBOX_SERIALIZATION_FAILED, order.getGuid(), e);
+        }
+
+        AsyncMessageId messageId = new AsyncMessageId(UUID.randomUUID().toString(),
+                                                      kafkaDeliveryServiceProperties.orderPaidTopic());
+        AsyncMessage message = AsyncMessage.builder()
+                                           .messageId(messageId)
+                                           .value(json)
+                                           .type(AsyncMessageType.OUTBOX)
+                                           .status(AsyncMessageStatus.CREATED)
+                                           .build();
+        asyncMessageService.saveMessage(message);
+        log.info("Order {} paid event staged in outbox (id={})",
+                 order.getGuid(),
+                 messageId.getId());
     }
 }

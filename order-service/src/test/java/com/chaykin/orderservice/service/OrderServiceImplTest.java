@@ -4,7 +4,7 @@ import com.chaykin.common.exception.ServiceException;
 import com.chaykin.common.model.order.OrderDto;
 import com.chaykin.orderservice.converter.OrderConverter;
 import com.chaykin.orderservice.converter.OrderConverterImpl;
-import com.chaykin.orderservice.messaging.delivery.producer.OrderPaidProducer;
+import com.chaykin.orderservice.messaging.delivery.config.properties.KafkaDeliveryServiceProperties;
 import com.chaykin.orderservice.messaging.payment.producer.PaymentRequestProducer;
 import com.chaykin.orderservice.persistence.model.Order;
 import com.chaykin.orderservice.persistence.repository.OrderRepository;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,14 +41,22 @@ class OrderServiceImplTest {
     private PaymentRequestProducer paymentRequestProducer;
 
     @Mock
-    private OrderPaidProducer orderPaidProducer;
+    private AsyncMessageService asyncMessageService;
 
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
         OrderConverter orderConverter = new OrderConverterImpl();
-        orderService = new OrderServiceImpl(orderRepository, orderConverter, paymentRequestProducer, orderPaidProducer);
+        KafkaDeliveryServiceProperties kafkaProps = new KafkaDeliveryServiceProperties("order.paid",
+                                                                                       "delivery.created");
+        JsonMapper jsonMapper = JsonMapper.builder().build();
+        orderService = new OrderServiceImpl(orderRepository,
+                                            orderConverter,
+                                            paymentRequestProducer,
+                                            asyncMessageService,
+                                            kafkaProps,
+                                            jsonMapper);
     }
 
     @Nested
