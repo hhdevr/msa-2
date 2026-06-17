@@ -4,6 +4,7 @@ import com.chaykin.common.exception.ServiceException;
 import com.chaykin.common.model.delivery.DeliveryDto;
 import com.chaykin.deliveryservice.converter.DeliveryConverter;
 import com.chaykin.deliveryservice.converter.DeliveryConverterImpl;
+import com.chaykin.deliveryservice.messaging.order.producer.DeliveryCreatedProducer;
 import com.chaykin.deliveryservice.persistence.model.Delivery;
 import com.chaykin.deliveryservice.persistence.repository.DeliveryRepository;
 import org.instancio.Instancio;
@@ -34,12 +35,15 @@ class DeliveryServiceImplTest {
     @Mock
     private DeliveryRepository deliveryRepository;
 
+    @Mock
+    private DeliveryCreatedProducer deliveryCreatedProducer;
+
     private DeliveryService deliveryService;
 
     @BeforeEach
     void setUp() {
         DeliveryConverter deliveryConverter = new DeliveryConverterImpl();
-        deliveryService = new DeliveryServiceImpl(deliveryRepository, deliveryConverter);
+        deliveryService = new DeliveryServiceImpl(deliveryRepository, deliveryConverter, deliveryCreatedProducer);
     }
 
     @Nested

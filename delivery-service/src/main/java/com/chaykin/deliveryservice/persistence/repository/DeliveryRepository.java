@@ -11,7 +11,11 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
     Optional<Delivery> findByGuid(UUID guid);
 
+    Optional<Delivery> findByOrderRefId(UUID orderRefId);
+
     boolean existsByGuid(UUID guid);
+
+    boolean existsByOrderRefId(UUID orderRefId);
 
     List<Delivery> findAllByActiveTrue();
 }
